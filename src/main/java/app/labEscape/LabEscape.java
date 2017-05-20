@@ -49,7 +49,7 @@ public class LabEscape {
             for(Point freePoint: horizontalPaths){
                 initalArray[freePoint.getX()][freePoint.getY()] = 'X';
                 updatePointPaths(freePoint);
-                if(freePoint.getFreeHorizontalPaths().isEmpty()){
+                if(freePoint.getFreeHorizontalPaths().isEmpty() && freePoint.getFreeHorizontalPaths().isEmpty()){
                     break;
                 }
                 traverse(freePoint);
@@ -61,7 +61,7 @@ public class LabEscape {
                 for(Point freePoint: verticalPaths){
                     initalArray[freePoint.getX()][freePoint.getX()] = 'X';
                     updatePointPaths(freePoint);
-                    if(freePoint.getFreeVerticalPaths().isEmpty()){
+                    if(freePoint.getFreeVerticalPaths().isEmpty() && freePoint.getFreeHorizontalPaths().isEmpty()){
                         break;
                     }
                     traverse(freePoint);
