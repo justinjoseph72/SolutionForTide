@@ -116,7 +116,7 @@ public class LabEscape {
      * This method will update the horizontal free path and vertical free paths for a given point
      * @param point
      */
-    private static void updatePointPaths(Point point) {
+    public static void updatePointPaths(Point point) {
         updateFreeVerticalPaths(point);
         updateHorizontalPaths(point);
     }

@@ -1,5 +1,6 @@
 package app.controller;
 
+import app.helper.MazeHelper;
 import app.labEscape.LabEscape;
 import app.labEscape.NoEscapeException;
 import io.swagger.annotations.ApiOperation;
@@ -43,7 +44,7 @@ public class MazeController {
             @ApiParam(value = "this is the start Y value") @RequestParam int startY )
     {
         try{
-            initalArray = tokeize(maze);
+            initalArray = MazeHelper.getCharArrayFromString(maze);
             char [][] output = LabEscape.drawPathForEscape(initalArray,startX,startY);
             HttpHeaders headers = new HttpHeaders();
             headers.set("result",output.toString());
@@ -57,27 +58,7 @@ public class MazeController {
         }
     }
 
-    private char[][] tokeize(String baseString){
-        StringTokenizer tokenizer = new StringTokenizer(baseString,"|");
-        char[][] initialArray = new char[tokenizer.countTokens()][];
-        int rowCOunter = 0;
-        while (tokenizer.hasMoreTokens()){
-            String arr = tokenizer.nextToken();
-            StringTokenizer innerTokenizer = new StringTokenizer(arr.substring(1,arr.length()),",");
-            char[] innerArray = new char[innerTokenizer.countTokens()];
-            int columnCounter = 0;
-            while (innerTokenizer.hasMoreTokens()){
-                String add = innerTokenizer.nextToken();
-               innerArray[columnCounter] = add.charAt(0);
-                columnCounter ++;
-            }
-            initialArray[rowCOunter] = innerArray;
-            rowCOunter ++;
-        }
 
-        return initialArray;
-
-    }
 
 }
 
