@@ -32,43 +32,81 @@ public class LabEscape {
         COLOUMN = labyrinth[0].length;
         Point startingPoint = new Point(startX,startY);
         updatePointPaths(startingPoint);
+        traverse(startingPoint);
         return finalMaze;
     }
 
-    private static void updatePointPaths(Point startingPoint) {
-        updateFreeVerticalPaths(startingPoint);
-        updateHorizontalPaths(startingPoint);
+    /**
+     * This method will have the logic to traverse the maze
+     * @param startingPoint
+     */
+    private static void traverse(Point startingPoint) {
+        initalArray[startingPoint.getX()][startingPoint.getY()] = PATH;
+        List<Point> horizontalPaths = startingPoint.getFreeHorizontalPaths();
+        //first traverse horizontally  then traverse vertically
+        if(horizontalPaths!=null && !horizontalPaths.isEmpty()){
+            //traverse Horizontaly
+            for(Point freePoint: horizontalPaths){
+                initalArray[freePoint.getX()][freePoint.getY()] = 'X';
+                updatePointPaths(freePoint);
+                traverse(freePoint);
+            }
+        }
+        // traverse vertically
+            List<Point> verticalPaths = startingPoint.getFreeVerticalPaths();
+            if(verticalPaths!=null && !verticalPaths.isEmpty()){
+                for(Point freePoint: verticalPaths){
+                    initalArray[freePoint.getX()][freePoint.getX()] = 'X';
+                    updatePointPaths(freePoint);
+                    traverse(freePoint);
+                }
+            }
+
     }
 
     /**
-     * This method will create a list of points which has empty surrounding the point
-     * @param startingPoint
+     * This method will update the horizontal free path and vertical free paths for a given point
+     * @param point
+     */
+    private static void updatePointPaths(Point point) {
+        updateFreeVerticalPaths(point);
+        updateHorizontalPaths(point);
+    }
+
+    /**
+     * This method will create a list of points which has empty and lateral to the point
+     * @param point
      * @return
      */
-    private static void updateHorizontalPaths(Point startingPoint) {
+    private static void updateHorizontalPaths(Point point) {
         List<Point> freePoints = new ArrayList<>();
-        if(startingPoint.getY()>0){
-            for(int i=startingPoint.getY()-1;i>=0;i--){
-                if(initalArray[startingPoint.getX()][i] == FREE){
-                    freePoints.add(new Point(startingPoint.getX(),i));
+        if(point.getY()>0){
+            for(int i=point.getY()-1;i>=0;i--){
+                if(initalArray[point.getX()][i] == FREE){
+                    freePoints.add(new Point(point.getX(),i));
                 }
-                if(initalArray[startingPoint.getX()][i] == WALL){
+                if(initalArray[point.getX()][i] == WALL){
                     break;
                 }
             }
-            for(int i=startingPoint.getY()+1;i<COLOUMN;i++){
-                if(initalArray[startingPoint.getX()][i] == FREE){
-                    freePoints.add(new Point(startingPoint.getX(),i));
+            for(int i=point.getY()+1;i<COLOUMN;i++){
+                if(initalArray[point.getX()][i] == FREE){
+                    freePoints.add(new Point(point.getX(),i));
                 }
-                if(initalArray[startingPoint.getX()][i] == WALL){
+                if(initalArray[point.getX()][i] == WALL){
                     break;
                 }
             }
         }
-        startingPoint.setFreeHorizontalPaths(freePoints);
+        point.setFreeHorizontalPaths(freePoints);
 
     }
 
+    /**
+     * This method will create a list of points which has empty and vertical to the point
+     * @param point
+     * @return
+     */
     private static void  updateFreeVerticalPaths(Point startingPoint){
         List<Point> freePoints = new ArrayList<>();
         if(startingPoint.getX()>0){
