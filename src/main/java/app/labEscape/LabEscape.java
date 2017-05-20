@@ -27,54 +27,77 @@ public class LabEscape {
      */
     public static char[][] drawPathForEscape(char[][] labyrinth, int startX, int startY) throws NoEscapeException {
         initalArray = labyrinth;
-        char[][] finalMaze = labyrinth;
         ROW = labyrinth.length;
         COLOUMN = labyrinth[0].length;
         Point startingPoint = new Point(startX,startY);
         updatePointPaths(startingPoint);
         traverse(startingPoint);
-        return finalMaze;
+        checkForPathFound();
+        return initalArray;
+    }
+
+    /**
+     * This method will check if there are any PATH in the boundary of the maze.
+     * If it does not find a PATH in the boundary, a NoEscapeException is thrown
+     * @throws NoEscapeException
+     */
+    private static void checkForPathFound() throws NoEscapeException {
+        int counter =0;
+        for(int i=0;i<ROW;i++){
+            if(initalArray[i][COLOUMN-1]== PATH ||  initalArray[i][0] == PATH){
+                counter++;
+            }
+        }
+        for(int i=0;i<COLOUMN;i++){
+            if(initalArray[0][i] == PATH || initalArray[ROW-1][i] == PATH){
+                counter++;
+            }
+        }
+        if(counter==0){
+            throw new NoEscapeException();
+        }
     }
 
     /**
      * This method will have the logic to traverse the maze
-     * @param startingPoint
+     * The method will not traverse if the point is in the boundary of the maze.
+     * Otherwise it will first traverse the horizontal paths and then the vertical paths
+     * @param point
      */
-    private static void traverse(Point startingPoint) {
-        initalArray[startingPoint.getX()][startingPoint.getY()] = PATH;
-        List<Point> horizontalPaths = startingPoint.getFreeHorizontalPaths();
+    private static void traverse(Point point) {
+        initalArray[point.getX()][point.getY()] = PATH;
+        // if the point lies on the bounday then return from the method
+        if(checkPointAtBoundary(point)){
+           return;
+        }
+        List<Point> horizontalPaths = point.getFreeHorizontalPaths();
         //first traverse horizontally  then traverse vertically
         if(horizontalPaths!=null && !horizontalPaths.isEmpty()){
             //traverse Horizontaly
-            for(Point freePoint: horizontalPaths){
-                initalArray[freePoint.getX()][freePoint.getY()] = 'X';
-                if(checkPointAtBoundary(freePoint)){
-                    break;
-                }
-                updatePointPaths(freePoint);
-                if(freePoint.getFreeHorizontalPaths().isEmpty() && freePoint.getFreeHorizontalPaths().isEmpty()){
-                    break;
-                }
-                checkPointAtBoundary(freePoint);
-                traverse(freePoint);
-            }
+            updateandTraversePaths(horizontalPaths);
         }
         // traverse vertically
-            List<Point> verticalPaths = startingPoint.getFreeVerticalPaths();
+            List<Point> verticalPaths = point.getFreeVerticalPaths();
             if(verticalPaths!=null && !verticalPaths.isEmpty()){
-                for(Point freePoint: verticalPaths){
-                    initalArray[freePoint.getX()][freePoint.getX()] = 'X';
-                    if(checkPointAtBoundary(freePoint)){
-                        break;
-                    }
-                    updatePointPaths(freePoint);
-                    if(freePoint.getFreeVerticalPaths().isEmpty() && freePoint.getFreeHorizontalPaths().isEmpty()){
-                        break;
-                    }
-                    traverse(freePoint);
-                }
+                updateandTraversePaths(verticalPaths);
             }
 
+    }
+
+    /**
+     * This method will update the point to Path and
+     * then will update the freePaths for the points and traverse it again
+     * @param horizontalPaths
+     */
+    private static void updateandTraversePaths(List<Point> horizontalPaths) {
+        for(Point freePoint: horizontalPaths){
+            initalArray[freePoint.getX()][freePoint.getY()] = PATH;
+            updatePointPaths(freePoint);
+            if(freePoint.getFreeHorizontalPaths().isEmpty() && freePoint.getFreeHorizontalPaths().isEmpty()){
+                break;
+            }
+            traverse(freePoint);
+        }
     }
 
     /**
@@ -107,7 +130,7 @@ public class LabEscape {
         List<Point> freePoints = new ArrayList<>();
         if(point.getY()>0){
             for(int i=point.getY()-1;i>=0;i--){
-                if(initalArray[point.getX()][i] == FREE){
+                if(initalArray[point.getX()][i] == FREE || initalArray[point.getX()][i] == PATH){
                     freePoints.add(new Point(point.getX(),i));
                 }
                 if(initalArray[point.getX()][i] == WALL){
@@ -115,7 +138,7 @@ public class LabEscape {
                 }
             }
             for(int i=point.getY()+1;i<COLOUMN;i++){
-                if(initalArray[point.getX()][i] == FREE){
+                if(initalArray[point.getX()][i] == FREE || initalArray[point.getX()][i] == FREE){
                     freePoints.add(new Point(point.getX(),i));
                 }
                 if(initalArray[point.getX()][i] == WALL){
@@ -132,27 +155,27 @@ public class LabEscape {
      * @param point
      * @return
      */
-    private static void  updateFreeVerticalPaths(Point startingPoint){
+    private static void  updateFreeVerticalPaths(Point point){
         List<Point> freePoints = new ArrayList<>();
-        if(startingPoint.getX()>0){
-            for(int i= startingPoint.getX()-1;i>=0;i--){
-            if(initalArray[i][startingPoint.getY()]==FREE){
-                freePoints.add(new Point(i,startingPoint.getY()));
+        if(point.getX()>0){
+            for(int i= point.getX()-1;i>=0;i--){
+            if(initalArray[i][point.getY()]==FREE || initalArray[i][point.getY()]==PATH){
+                freePoints.add(new Point(i,point.getY()));
             }
-            if(initalArray[i][startingPoint.getY()]==WALL){
+            if(initalArray[i][point.getY()]==WALL){
                 break;
             }
             }
-            for(int i=startingPoint.getX()+1;i<ROW;i++){
-                if(initalArray[i][startingPoint.getY()]==FREE){
-                    freePoints.add(new Point(i,startingPoint.getY()));
+            for(int i=point.getX()+1;i<ROW;i++){
+                if(initalArray[i][point.getY()]==FREE || initalArray[i][point.getY()]==PATH){
+                    freePoints.add(new Point(i,point.getY()));
                 }
-                if(initalArray[i][startingPoint.getY()]==WALL){
+                if(initalArray[i][point.getY()]==WALL){
                     break;
                 }
             }
         }
-        startingPoint.setFreeVerticalPaths(freePoints);
+        point.setFreeVerticalPaths(freePoints);
 
     }
 
