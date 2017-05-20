@@ -48,10 +48,14 @@ public class LabEscape {
             //traverse Horizontaly
             for(Point freePoint: horizontalPaths){
                 initalArray[freePoint.getX()][freePoint.getY()] = 'X';
+                if(checkPointAtBoundary(freePoint)){
+                    break;
+                }
                 updatePointPaths(freePoint);
                 if(freePoint.getFreeHorizontalPaths().isEmpty() && freePoint.getFreeHorizontalPaths().isEmpty()){
                     break;
                 }
+                checkPointAtBoundary(freePoint);
                 traverse(freePoint);
             }
         }
@@ -60,6 +64,9 @@ public class LabEscape {
             if(verticalPaths!=null && !verticalPaths.isEmpty()){
                 for(Point freePoint: verticalPaths){
                     initalArray[freePoint.getX()][freePoint.getX()] = 'X';
+                    if(checkPointAtBoundary(freePoint)){
+                        break;
+                    }
                     updatePointPaths(freePoint);
                     if(freePoint.getFreeVerticalPaths().isEmpty() && freePoint.getFreeHorizontalPaths().isEmpty()){
                         break;
@@ -68,6 +75,18 @@ public class LabEscape {
                 }
             }
 
+    }
+
+    /**
+     * This method will check if the given point is at the boundary of the matrix or not
+     * @param point
+     * @return
+     */
+    private static boolean checkPointAtBoundary(Point point) {
+        if(point.getX()==0  || point.getY()==0  || point.getY()==COLOUMN-1 || point.getX() == ROW-1){
+            return true;
+        }
+        return false;
     }
 
     /**
